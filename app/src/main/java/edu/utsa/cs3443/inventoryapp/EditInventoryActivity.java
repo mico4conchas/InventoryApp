@@ -27,6 +27,12 @@ public class EditInventoryActivity extends AppCompatActivity {
 
         int itemId = getIntent().getIntExtra("inventory_item_id", -1);
 
+        if (itemId == -1) {
+            Toast.makeText(this, "Invalid item ID", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
         InventoryRepository repository = InventoryRepository.getInstance(this);
         inventoryItem = repository.getInventoryItemById(itemId);
 

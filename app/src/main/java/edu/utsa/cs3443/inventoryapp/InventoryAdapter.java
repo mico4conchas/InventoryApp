@@ -29,15 +29,19 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Inve
     public void onBindViewHolder(InventoryViewHolder holder, int position) {
         InventoryItem inventoryItem = inventoryList.get(position);
 
+        // Ensure the data is being correctly set
         holder.itemNameTextView.setText(inventoryItem.getItemName());
         holder.caseAmountTextView.setText(String.valueOf(inventoryItem.getCaseAmount()));
         holder.itemsPerCaseTextView.setText(String.valueOf(inventoryItem.getItemsPerCase()));
 
+        // Clear any previous listeners and set the new listener for this position
+        holder.editButton.setOnClickListener(null);  // Reset previous listeners
         holder.editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // Ensure we are passing the correct item ID
                 Intent intent = new Intent(holder.itemView.getContext(), EditInventoryActivity.class);
-                intent.putExtra("inventory_item_id", inventoryItem.getId());
+                intent.putExtra("inventory_item_id", inventoryItem.getId());  // Pass the unique item ID
                 holder.itemView.getContext().startActivity(intent);
             }
         });

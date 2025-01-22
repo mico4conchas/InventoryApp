@@ -1,21 +1,51 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:gravity="center_vertical"
+    android:weightSum="1">
 
     <Button
         android:id="@+id/btn_view_inventory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="View Inventory"
-        android:layout_marginBottom="16dp" />
+        android:text="View Inventory" />
 
     <Button
         android:id="@+id/btn_add_inventory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Add Inventory" />
+        android:text="Add Inventory"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btn_request_item"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Request Item"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btn_my_requests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="My Requests"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btn_view_all_requests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="View All Requests"
+        android:layout_marginTop="16dp" />
+
+    <Button
+        android:id="@+id/btn_sign_out"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sign Out"
+        android:layout_marginTop="16dp"/>
+
 </LinearLayout>

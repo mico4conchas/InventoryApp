@@ -6,10 +6,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-
 import androidx.recyclerview.widget.RecyclerView;
-
 import java.util.List;
+
 
 public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.InventoryViewHolder> {
 
@@ -21,29 +20,27 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Inve
 
     @Override
     public InventoryViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_inventory, parent, false);
-        return new InventoryViewHolder(itemView);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_inventory, parent, false);
+        return new InventoryViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(InventoryViewHolder holder, int position) {
-        InventoryItem inventoryItem = inventoryList.get(position);
+        InventoryItem item = inventoryList.get(position);
+        holder.nameTextView.setText(item.getItemName());
+        holder.caseAmountTextView.setText(String.valueOf(item.getCaseAmount()));
+        holder.itemsPerCaseTextView.setText(String.valueOf(item.getItemsPerCase()));
 
-        // Ensure the data is being correctly set
-        holder.itemNameTextView.setText(inventoryItem.getItemName());
-        holder.caseAmountTextView.setText(String.valueOf(inventoryItem.getCaseAmount()));
-        holder.itemsPerCaseTextView.setText(String.valueOf(inventoryItem.getItemsPerCase()));
+        // Set the click listener for the Edit button
+        holder.editButton.setOnClickListener(v -> {
+            // Create an intent to start the EditInventoryActivity
+            Intent intent = new Intent(v.getContext(), EditInventoryActivity.class);
 
-        // Clear any previous listeners and set the new listener for this position
-        holder.editButton.setOnClickListener(null);  // Reset previous listeners
-        holder.editButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Ensure we are passing the correct item ID
-                Intent intent = new Intent(holder.itemView.getContext(), EditInventoryActivity.class);
-                intent.putExtra("inventory_item_id", inventoryItem.getId());  // Pass the unique item ID
-                holder.itemView.getContext().startActivity(intent);
-            }
+            // Pass the item ID to EditInventoryActivity
+            intent.putExtra("inventory_item_id", item.getId());
+
+            // Start the activity
+            v.getContext().startActivity(intent);
         });
     }
 
@@ -54,17 +51,18 @@ public class InventoryAdapter extends RecyclerView.Adapter<InventoryAdapter.Inve
 
     public static class InventoryViewHolder extends RecyclerView.ViewHolder {
 
-        public TextView itemNameTextView;
-        public TextView caseAmountTextView;
-        public TextView itemsPerCaseTextView;
-        public Button editButton;
+        TextView nameTextView;
+        TextView caseAmountTextView;
+        TextView itemsPerCaseTextView;
+
+        Button editButton;
 
         public InventoryViewHolder(View itemView) {
             super(itemView);
-            itemNameTextView = itemView.findViewById(R.id.itemNameTextView);
-            caseAmountTextView = itemView.findViewById(R.id.caseAmountTextView);
-            itemsPerCaseTextView = itemView.findViewById(R.id.itemsPerCaseTextView);
-            editButton = itemView.findViewById(R.id.editButton);
+            nameTextView = itemView.findViewById(R.id.item_name);
+            caseAmountTextView = itemView.findViewById(R.id.case_amount);
+            itemsPerCaseTextView = itemView.findViewById(R.id.items_per_case);
+            editButton = itemView.findViewById(R.id.edit_button);
         }
     }
 }

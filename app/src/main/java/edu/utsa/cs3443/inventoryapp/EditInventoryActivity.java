@@ -5,7 +5,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AppCompatActivity;
 
 public class EditInventoryActivity extends AppCompatActivity {
@@ -13,7 +12,7 @@ public class EditInventoryActivity extends AppCompatActivity {
     private EditText itemNameEditText, caseAmountEditText, itemsPerCaseEditText;
     private Button saveButton;
     private InventoryItem inventoryItem;
-    private int itemPosition;  // Track the position of the item in the list
+    private int itemPosition; // Track the position of the item in the list
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,6 +24,7 @@ public class EditInventoryActivity extends AppCompatActivity {
         itemsPerCaseEditText = findViewById(R.id.itemsPerCaseEditText);
         saveButton = findViewById(R.id.saveChangesButton);
 
+        // Retrieve the item ID passed via the intent
         int itemId = getIntent().getIntExtra("inventory_item_id", -1);
 
         if (itemId == -1) {
@@ -33,11 +33,15 @@ public class EditInventoryActivity extends AppCompatActivity {
             return;
         }
 
+        // Get the repository instance
         InventoryRepository repository = InventoryRepository.getInstance(this);
         inventoryItem = repository.getInventoryItemById(itemId);
 
         if (inventoryItem != null) {
-            itemPosition = repository.getInventoryList().indexOf(inventoryItem);  // Track the item's position
+            // Find the position of the item in the list
+            itemPosition = repository.getInventoryList().indexOf(inventoryItem);
+
+            // Populate the fields with current item data
             itemNameEditText.setText(inventoryItem.getItemName());
             caseAmountEditText.setText(String.valueOf(inventoryItem.getCaseAmount()));
             itemsPerCaseEditText.setText(String.valueOf(inventoryItem.getItemsPerCase()));
@@ -54,16 +58,14 @@ public class EditInventoryActivity extends AppCompatActivity {
                     int caseAmount = Integer.parseInt(caseAmountEditText.getText().toString().trim());
                     int itemsPerCase = Integer.parseInt(itemsPerCaseEditText.getText().toString().trim());
 
+                    // Update the inventory item with new values
                     inventoryItem.setItemName(itemName);
                     inventoryItem.setCaseAmount(caseAmount);
                     inventoryItem.setItemsPerCase(itemsPerCase);
 
-                    // Update the inventory in the repository
-                    repository.updateInventoryItem(inventoryItem, EditInventoryActivity.this);
-
-                    // Update the item in the list and notify the adapter
-                    repository.getInventoryList().set(itemPosition, inventoryItem);  // Update the list
-                    InventoryListActivity.inventoryAdapter.notifyItemChanged(itemPosition);  // Notify the adapter
+                    // Update the repository and notify the adapter
+                    repository.updateInventoryItem(inventoryItem);
+                    InventoryListActivity.inventoryAdapter.notifyItemChanged(itemPosition);
 
                     Toast.makeText(EditInventoryActivity.this, "Item updated successfully", Toast.LENGTH_SHORT).show();
                     finish();

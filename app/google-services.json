@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "828429781020",
+    "project_id": "inventory-app-38ea8",
+    "storage_bucket": "inventory-app-38ea8.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:828429781020:android:82e34b2340e9e98ed637d9",
+        "android_client_info": {
+          "package_name": "edu.utsa.cs3443.inventoryapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5ABRGWYhnfRUUEjORENO8A9Lbt66JJcI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

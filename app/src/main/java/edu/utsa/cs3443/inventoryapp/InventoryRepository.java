@@ -1,38 +1,77 @@
 package edu.utsa.cs3443.inventoryapp;
 
+import android.content.ContentValues;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.widget.Toast;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
 public class InventoryRepository {
 
     private static InventoryRepository instance;
+    private SQLiteDatabase database;
+    private InventoryDbHelper dbHelper;
     private List<InventoryItem> inventoryList;
-    private static final String PREFS_NAME = "InventoryPrefs";
-    private static final String INVENTORY_KEY = "inventory";
 
     private InventoryRepository(Context context) {
-        loadInventory(context);
+        dbHelper = new InventoryDbHelper(context);
+        database = dbHelper.getWritableDatabase();
+        inventoryList = new ArrayList<>();
+        loadInventoryList();
     }
 
-    public static synchronized InventoryRepository getInstance(Context context) {
+    public static InventoryRepository getInstance(Context context) {
         if (instance == null) {
             instance = new InventoryRepository(context);
         }
         return instance;
     }
 
+    // Load inventory items from the database into the list
+    private void loadInventoryList() {
+        Cursor cursor = database.query(
+                InventoryDbHelper.TABLE_INVENTORY,
+                null, null, null, null, null, null
+        );
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int id = cursor.getInt(cursor.getColumnIndex(InventoryDbHelper.COLUMN_ID));
+                String itemName = cursor.getString(cursor.getColumnIndex(InventoryDbHelper.COLUMN_ITEM_NAME));
+                int caseAmount = cursor.getInt(cursor.getColumnIndex(InventoryDbHelper.COLUMN_CASE_AMOUNT));
+                int itemsPerCase = cursor.getInt(cursor.getColumnIndex(InventoryDbHelper.COLUMN_ITEMS_PER_CASE));
+
+                // Corrected constructor call with 3 parameters
+                InventoryItem item = new InventoryItem(id, itemName, caseAmount, itemsPerCase);
+                item.setId(id); // Set the ID after creating the object
+                inventoryList.add(item);
+            }
+            cursor.close();
+        }
+    }
+
+    // Add an inventory item to the list and database
+    public void addInventoryItem(InventoryItem item) {
+        ContentValues values = new ContentValues();
+        values.put(InventoryDbHelper.COLUMN_ITEM_NAME, item.getItemName());
+        values.put(InventoryDbHelper.COLUMN_CASE_AMOUNT, item.getCaseAmount());
+        values.put(InventoryDbHelper.COLUMN_ITEMS_PER_CASE, item.getItemsPerCase());
+
+        long rowId = database.insert(InventoryDbHelper.TABLE_INVENTORY, null, values);
+        if (rowId != -1) {
+            item.setId((int) rowId);
+            inventoryList.add(item);
+        }
+    }
+
+    // Get all inventory items
     public List<InventoryItem> getInventoryList() {
         return inventoryList;
     }
 
+    // Get an inventory item by ID
     public InventoryItem getInventoryItemById(int id) {
         for (InventoryItem item : inventoryList) {
             if (item.getId() == id) {
@@ -42,47 +81,46 @@ public class InventoryRepository {
         return null;
     }
 
-    public void addInventoryItem(InventoryItem item, Context context) {
-        inventoryList.add(item);
-        saveInventory(context);
-        Toast.makeText(context, "Item added successfully", Toast.LENGTH_SHORT).show();
-    }
+    // Update an inventory item in the database and the list
+    public void updateInventoryItem(InventoryItem item) {
+        ContentValues values = new ContentValues();
+        values.put(InventoryDbHelper.COLUMN_ITEM_NAME, item.getItemName());
+        values.put(InventoryDbHelper.COLUMN_CASE_AMOUNT, item.getCaseAmount());
+        values.put(InventoryDbHelper.COLUMN_ITEMS_PER_CASE, item.getItemsPerCase());
 
-    public void updateInventoryItem(InventoryItem updatedItem, Context context) {
+        String whereClause = InventoryDbHelper.COLUMN_ID + " = ?";
+        String[] whereArgs = {String.valueOf(item.getId())};
+
+        database.update(InventoryDbHelper.TABLE_INVENTORY, values, whereClause, whereArgs);
+
+        // Update the list in memory
         for (int i = 0; i < inventoryList.size(); i++) {
-            if (inventoryList.get(i).getId() == updatedItem.getId()) {
-                inventoryList.set(i, updatedItem);
-                saveInventory(context);
-                return;
+            if (inventoryList.get(i).getId() == item.getId()) {
+                inventoryList.set(i, item);
+                break;
             }
         }
-        Toast.makeText(context, "Item not found in repository", Toast.LENGTH_SHORT).show();
     }
 
-    public void clearInventory(Context context) {
+    // Delete an inventory item from the list and database
+    public void deleteInventoryItem(InventoryItem item) {
+        String whereClause = InventoryDbHelper.COLUMN_ID + " = ?";
+        String[] whereArgs = {String.valueOf(item.getId())};
+
+        database.delete(InventoryDbHelper.TABLE_INVENTORY, whereClause, whereArgs);
+        inventoryList.remove(item);
+    }
+
+    // Clear the entire inventory from both the database and the in-memory list
+    public void clearInventory() {
+        // Delete all items from the database
+        database.delete(InventoryDbHelper.TABLE_INVENTORY, null, null);
+
+        // Clear the in-memory list
         inventoryList.clear();
-        saveInventory(context);
-        Toast.makeText(context, "Inventory cleared", Toast.LENGTH_SHORT).show();
     }
 
-    private void saveInventory(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        Gson gson = new Gson();
-        String json = gson.toJson(inventoryList);
-        editor.putString(INVENTORY_KEY, json);
-        editor.apply();
-    }
-
-    private void loadInventory(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        Gson gson = new Gson();
-        String json = prefs.getString(INVENTORY_KEY, null);
-        Type type = new TypeToken<ArrayList<InventoryItem>>() {}.getType();
-        inventoryList = gson.fromJson(json, type);
-
-        if (inventoryList == null) {
-            inventoryList = new ArrayList<>();
-        }
+    public void close() {
+        database.close();
     }
 }

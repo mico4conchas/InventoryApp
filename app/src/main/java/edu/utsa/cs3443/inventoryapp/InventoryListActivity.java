@@ -1,76 +1,64 @@
 package edu.utsa.cs3443.inventoryapp;
 
-import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.util.List;
-
 public class InventoryListActivity extends AppCompatActivity {
 
+    // Make inventoryAdapter static and public for access from other activities
+    public static InventoryAdapter inventoryAdapter;
+
     private RecyclerView recyclerView;
-    public static InventoryAdapter inventoryAdapter; // Made static to notify from EditInventoryActivity
-    private List<InventoryItem> inventoryList;
+    private InventoryRepository repository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inventory_list);
 
-        recyclerView = findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this)); // Setting LayoutManager
+        recyclerView = findViewById(R.id.inventoryRecyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        // Get the inventory list from the repository
-        inventoryList = InventoryRepository.getInstance(this).getInventoryList();
+        repository = InventoryRepository.getInstance(this);
 
-        // Set the adapter for the RecyclerView
-        inventoryAdapter = new InventoryAdapter(inventoryList);
+        // Initialize the adapter and set it to the RecyclerView
+        inventoryAdapter = new InventoryAdapter(repository.getInventoryList());
         recyclerView.setAdapter(inventoryAdapter);
 
-        // Set up buttons for return and clear inventory
-        Button returnButton = findViewById(R.id.returnButton);
-        returnButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                finish(); // Close the activity and return to the previous one
-            }
-        });
-
+        // Set up Clear Inventory Button with Confirmation Dialog
         Button clearInventoryButton = findViewById(R.id.clearInventoryButton);
-        clearInventoryButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showClearInventoryConfirmation();
-            }
+        clearInventoryButton.setOnClickListener(v -> showClearInventoryConfirmation());
+
+        // Set up Return to Menu Button
+        Button returnToMenuButton = findViewById(R.id.returnToMenuButton);
+        returnToMenuButton.setOnClickListener(v -> {
+            Intent intent = new Intent(InventoryListActivity.this, MainActivity.class);
+            startActivity(intent);
+            finish(); // Close the current activity and return to the previous one
         });
     }
 
+    // Method to show the confirmation dialog
     private void showClearInventoryConfirmation() {
         new AlertDialog.Builder(this)
                 .setTitle("Clear Inventory")
-                .setMessage("Are you sure you want to clear all items in the inventory?")
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        clearInventory();
-                    }
+                .setMessage("Are you sure you want to clear all inventory items?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Clear inventory and refresh the RecyclerView
+                    repository.clearInventory();
+                    inventoryAdapter.notifyDataSetChanged();
+                    Toast.makeText(this, "Inventory cleared.", Toast.LENGTH_SHORT).show();
                 })
-                .setNegativeButton("No", null)
+                .setNegativeButton("No", (dialog, which) -> {
+                    // Do nothing if user cancels
+                    dialog.dismiss();
+                })
                 .show();
-    }
-
-    private void clearInventory() {
-        InventoryRepository.getInstance(InventoryListActivity.this).clearInventory(InventoryListActivity.this);
-        Toast.makeText(InventoryListActivity.this, "Inventory cleared", Toast.LENGTH_SHORT).show();
-
-        // Refresh the inventory list and notify the adapter to update the UI
-        inventoryAdapter.notifyDataSetChanged();
     }
 }

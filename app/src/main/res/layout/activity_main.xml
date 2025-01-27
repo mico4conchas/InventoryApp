@@ -40,6 +40,12 @@
         android:layout_height="wrap_content"
         android:text="View All Requests"
         android:layout_marginTop="16dp" />
+    <Button
+        android:id="@+id/btn_clear_requests"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Clear Requests"
+        android:layout_marginTop="16dp" />
 
     <Button
         android:id="@+id/btn_sign_out"

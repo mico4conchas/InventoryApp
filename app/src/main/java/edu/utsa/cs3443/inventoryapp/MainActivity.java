@@ -11,6 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -65,6 +68,35 @@ public class MainActivity extends AppCompatActivity {
             startActivity(new Intent(MainActivity.this, SignInActivity.class));
             finish();
         });
+
+        // Button to clear the requests collection
+        Button clearRequestsButton = findViewById(R.id.btn_clear_requests);
+        clearRequestsButton.setOnClickListener(v -> clearRequestsCollection());
+    }
+
+    private void clearRequestsCollection() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference requestsRef = db.collection("requests");
+
+        // Get all documents in the collection
+        requestsRef.get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (DocumentSnapshot document : queryDocumentSnapshots) {
+                        // Delete each document
+                        document.getReference().delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    // Optionally, you can add some logic here to track progress
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Handle any errors that occur during deletion
+                                    Toast.makeText(this, "Error deleting document: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                });
+                    }
+                    Toast.makeText(this, "All entries cleared.", Toast.LENGTH_SHORT).show();
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error fetching documents: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override

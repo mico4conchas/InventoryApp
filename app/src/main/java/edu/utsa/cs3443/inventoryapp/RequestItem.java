@@ -14,20 +14,31 @@ public class RequestItem {
     private String userId;
     private String status;
     private String responderId;
+    private int casesToGive; // New field
+    private int itemsPerCaseToGive; // New field
+    private String message; // New field
 
     // No-argument constructor required by Firestore
     public RequestItem() {
         // Empty constructor needed for Firestore to deserialize data
     }
 
-    // Constructor with parameters
+    // Constructor with default values for new fields
     public RequestItem(String itemName, int casesNeeded, int itemsPerCase, String userId, String status, String responderId) {
+        this(itemName, casesNeeded, itemsPerCase, userId, status, responderId, 0, 0, null);
+    }
+
+    // Constructor with all parameters
+    public RequestItem(String itemName, int casesNeeded, int itemsPerCase, String userId, String status, String responderId, int casesToGive, int itemsPerCaseToGive, String message) {
         this.itemName = itemName;
         this.casesNeeded = casesNeeded;
         this.itemsPerCase = itemsPerCase;
         this.userId = userId;
         this.status = status;
         this.responderId = responderId;
+        this.casesToGive = casesToGive;
+        this.itemsPerCaseToGive = itemsPerCaseToGive;
+        this.message = message;
     }
 
     // Getters and setters
@@ -87,6 +98,30 @@ public class RequestItem {
         this.responderId = responderId;
     }
 
+    public int getCasesToGive() {
+        return casesToGive;
+    }
+
+    public void setCasesToGive(int casesToGive) {
+        this.casesToGive = casesToGive;
+    }
+
+    public int getItemsPerCaseToGive() {
+        return itemsPerCaseToGive;
+    }
+
+    public void setItemsPerCaseToGive(int itemsPerCaseToGive) {
+        this.itemsPerCaseToGive = itemsPerCaseToGive;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
     @Override
     public String toString() {
         return "RequestItem{" +
@@ -97,6 +132,9 @@ public class RequestItem {
                 ", userId='" + userId + '\'' +
                 ", status='" + status + '\'' +
                 ", responderId='" + responderId + '\'' +
+                ", casesToGive=" + casesToGive +
+                ", itemsPerCaseToGive=" + itemsPerCaseToGive +
+                ", message='" + message + '\'' +
                 '}';
     }
 }

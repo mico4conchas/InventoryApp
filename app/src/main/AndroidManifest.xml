@@ -34,49 +34,48 @@
         <activity
             android:name=".SignInActivity"
             android:exported="true">
-            <!-- Add intent filters if needed -->
         </activity>
 
         <!-- Inventory List Activity -->
         <activity
             android:name=".InventoryListActivity"
             android:exported="true">
-            <!-- Add intent filters if needed -->
         </activity>
 
         <!-- Add Inventory Activity -->
         <activity
             android:name=".AddInventoryActivity"
             android:exported="true">
-            <!-- Add intent filters if needed -->
         </activity>
 
         <!-- Edit Inventory Activity -->
         <activity
             android:name=".EditInventoryActivity"
             android:exported="true">
-            <!-- Add intent filters if needed -->
         </activity>
 
         <!-- Request Item Activity -->
         <activity
             android:name=".RequestItemActivity"
             android:exported="true">
-            <!-- Add intent filters if needed -->
         </activity>
 
         <!-- View Requests Activity -->
         <activity
             android:name=".ViewRequestsActivity"
             android:exported="true">
-            <!-- Add intent filters if needed -->
         </activity>
 
         <!-- View All Requests Activity -->
         <activity
             android:name=".ViewAllRequestsActivity"
             android:exported="true">
-            <!-- Add intent filters if needed -->
+        </activity>
+
+        <!-- Respond To Request Activity -->
+        <activity
+            android:name=".RespondToRequestActivity"
+            android:exported="true">
         </activity>
 
     </application>

@@ -1,6 +1,7 @@
 package edu.utsa.cs3443.inventoryapp;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,18 +46,11 @@ public class RequestsAdapter extends RecyclerView.Adapter<RequestsAdapter.Reques
         if ("Pending".equals(requestItem.getStatus())) {
             holder.acceptButton.setVisibility(View.VISIBLE);
             holder.acceptButton.setOnClickListener(v -> {
-                requestItem.setStatus("Accepted");
-                requestItem.setResponderId("currentUserId"); // Replace with actual user ID
-
-                firestore.collection("requests")
-                        .document(requestItem.getId())
-                        .update("status", "Accepted", "responderId", "currentUserId")
-                        .addOnSuccessListener(aVoid -> {
-                            Toast.makeText(context, "Request Accepted!", Toast.LENGTH_SHORT).show();
-                            // Notify the adapter that the data has changed
-                            notifyDataSetChanged();
-                        })
-                        .addOnFailureListener(e -> Toast.makeText(context, "Error updating request", Toast.LENGTH_SHORT).show());
+                // Start RespondToRequestActivity and pass relevant data
+                Intent intent = new Intent(context, RespondToRequestActivity.class);
+                intent.putExtra("itemName", requestItem.getItemName()); // Pass item name
+                intent.putExtra("requestId", requestItem.getId()); // Pass request ID
+                context.startActivity(intent);
             });
         } else {
             holder.acceptButton.setVisibility(View.GONE);
